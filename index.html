@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GENERADOR DE TARJETAS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;700;900&family=Poppins:wght@400;700&family=Bebas+Neue&family=Playfair+Display:wght@700&family=Great+Vibes&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body>
+<div class="bg-orbs" aria-hidden="true"><span class="orb orb-a"></span><span class="orb orb-b"></span><span class="orb orb-c"></span></div>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">◈</div>
+    <div>
+      <h1>GENERADOR DE TARJETAS</h1>
+    </div>
+  </div>
+  <div class="top-pills">
+    <span class="pill">🖼 Canvas HD</span>
+    <span class="pill">⬇ PNG + ZIP</span>
+    <span class="pill hide-mobile">�✦ Drag & Drop</span>
+  </div>
+</header>
+
+<main class="layout">
+  <!-- COLUMNA IZQUIERDA -->
+  <section class="panel">
+
+    <div class="card">
+      <div class="card-head">
+        <span class="step">1</span>
+        <div><h2>Imagen base</h2><p class="sub">PNG / JPG / WebP · se usa a tamaño real</p></div>
+      </div>
+      <div id="dropzone" class="dropzone">
+        <div class="dz-icon">⤴</div>
+        <p><strong>Arrastra tu imagen aquí</strong><br><span>o haz clic para explorar archivos</span></p>
+        <input type="file" id="imgInput" accept="image/*" hidden>
+      </div>
+      <div class="row between meta">
+        <small id="imgInfo" class="mono">Sin imagen</small>
+        <button id="btnClearImg" class="btn small ghost" disabled>Quitar</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="step">2</span>
+        <div><h2>Nombres / textos</h2><p class="sub">Un nombre por línea = una tarjeta</p></div>
+        <span id="namesCount" class="count">0</span>
+      </div>
+      <textarea id="namesInput" rows="6" placeholder="Ej:&#10;Ana García&#10;Juan Pérez&#10;María López"></textarea>
+      <div class="row between meta">
+        <small class="hint">Tip: pega directo desde Excel / Sheets</small>
+        <button id="btnClearNames" class="btn small ghost">Limpiar</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="step">3</span>
+        <div><h2>Estilo global</h2><p class="sub">Se aplica a todas las tarjetas</p></div>
+      </div>
+
+      <label class="field">
+        <div class="field-top"><span>Tamaño de fuente</span><b id="fontSizeVal" class="val">72px</b></div>
+        <div class="row">
+          <input type="range" id="fontSize" min="10" max="250" value="72">
+          <input type="number" id="fontSizeNum" min="10" max="400" value="72" class="num">
+        </div>
+      </label>
+
+      <label class="field">
+        <span class="label">Tipografía</span>
+        <select id="fontFamily">
+          <option value="Montserrat, sans-serif">Montserrat</option>
+          <option value="Poppins, sans-serif">Poppins</option>
+          <option value="'Bebas Neue', sans-serif">Bebas Neue</option>
+          <option value="'Playfair Display', serif">Playfair Display</option>
+          <option value="'Great Vibes', cursive">Great Vibes (manuscrita)</option>
+          <option value="Arial, sans-serif">Arial</option>
+          <option value="Georgia, serif">Georgia</option>
+          <option value="Impact, sans-serif">Impact</option>
+        </select>
+      </label>
+
+      <div class="row gap">
+        <button id="btnBold" class="btn small toggle bold-btn" title="Negrita"><b>B</b></button>
+        <label class="field inline">
+          <span class="label">Color texto</span>
+          <div class="color-row">
+            <input type="color" id="fontColor" value="#ffffff">
+            <input type="text" id="fontColorHex" value="#ffffff" class="num hex mono" maxlength="7" spellcheck="false">
+          </div>
+        </label>
+      </div>
+
+      <div class="shadow-box">
+        <div class="row between">
+          <strong>☁ Sombra</strong>
+          <label class="switch">
+            <input type="checkbox" id="shadowEnabled" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div id="shadowControls">
+          <label class="field inline">
+            <span class="label">Color sombra</span>
+            <div class="color-row">
+              <input type="color" id="shadowColor" value="#000000">
+              <input type="text" id="shadowColorHex" value="#000000" class="num hex mono" maxlength="7" spellcheck="false">
+            </div>
+          </label>
+          <label class="field">
+            <div class="field-top"><span>Difuminado</span><b id="shadowBlurVal" class="val">8</b></div>
+            <input type="range" id="shadowBlur" min="0" max="50" value="8">
+          </label>
+          <div class="row two">
+            <label class="field"><div class="field-top"><span>Offset X</span><b id="offXVal" class="val">2</b></div><input type="range" id="shadowOffX" min="-30" max="30" value="2"></label>
+            <label class="field"><div class="field-top"><span>Offset Y</span><b id="offYVal" class="val">2</b></div><input type="range" id="shadowOffY" min="-30" max="30" value="2"></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="pos-box">
+        <strong>✥ Posición <small class="hint">· arrastrable en el lienzo</small></strong>
+        <label class="field"><div class="field-top"><span>Eje X</span><b id="posXVal" class="val">50%</b></div><input type="range" id="posX" min="0" max="100" value="50"></label>
+        <label class="field"><div class="field-top"><span>Eje Y</span><b id="posYVal" class="val">50%</b></div><input type="range" id="posY" min="0" max="100" value="50"></label>
+        <div class="row">
+          <button id="btnCenter" class="btn small ghost">◎ Centrar</button>
+          <small class="hint">💡 Arrastra o usa ←↑↓→</small>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- PREVIEW -->
+  <section class="preview">
+    <div class="card preview-card">
+      <div class="row between preview-top">
+        <div class="card-head">
+          <span class="step">4</span>
+          <div><h2>Vista previa</h2><p class="sub">Clic y arrastra el texto para moverlo</p></div>
+        </div>
+        <div class="nav">
+          <button id="btnPrev" class="btn small icon">‹</button>
+          <span id="previewLabel" class="mono">0 / 0</span>
+          <button id="btnNext" class="btn small icon">›</button>
+        </div>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="canvas" width="800" height="600" tabindex="0"></canvas>
+      </div>
+      <div class="row between meta">
+        <small id="canvasSize" class="hint mono">800 × 600 px</small>
+        <small class="hint">Doble clic en el lienzo + flechas = ajuste fino</small>
+      </div>
+    </div>
+
+    <div class="card download">
+      <div class="card-head">
+        <span class="step accent">5</span>
+        <div><h2>Exportar</h2><p class="sub">Alta resolución, tamaño original</p></div>
+      </div>
+      <div class="download-btns">
+        <button id="btnPng" class="btn primary" disabled><span>⬇</span> Descargar PNG actual</button>
+        <button id="btnZip" class="btn secondary" disabled><span>📦</span> Descargar ZIP · <span id="zipCount">0</span></button>
+      </div>
+      <small id="status" class="hint status"></small>
+    </div>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
